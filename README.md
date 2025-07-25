@@ -1,20 +1,29 @@
 # 🍎 Food Analysis & Nutrition Tracker
 
-A Node.js web server that allows users to upload food images and receive nutritional information and health suggestions.
+A Node.js web server for automated food image recognition and nutrition analysis. The system is designed to work with equipment that automatically captures and weighs food, then transmits the data to the server for analysis.
 
 ## Features
 
-- 📸 **Image Upload**: Drag-and-drop or click to upload food images
-- ⚖️ **Weight Input**: Enter food weight for accurate nutrition calculations
-- 🔍 **Food Recognition**: Analyze uploaded images (currently using mock data)
-- 📊 **Nutrition Analysis**: Get detailed nutritional information
+- 🤖 **Automated Equipment Integration**: Receives data from food analysis equipment via HTTP API
+- ⚖️ **Automatic Weight Detection**: Equipment provides precise weight measurements
+- 🔍 **Food Recognition**: Analyze uploaded images (currently using mock data, ready for AI integration)
+- 📊 **Nutrition Analysis**: Get detailed nutritional information based on weight and food type
 - 💡 **Health Suggestions**: Receive personalized health recommendations
-- 📱 **Responsive Design**: Works on desktop and mobile devices
+- 📱 **Real-time Display**: Results appear automatically on the web interface
+- 🖥️ **Clean Interface**: Simple welcome page that displays analysis results
+
+## System Architecture
+
+- **Equipment**: Captures images and weighs food automatically
+- **Web Server**: Processes data and provides analysis
+- **Web Interface**: Displays welcome message and shows results in real-time
+- **Simulator**: Included for testing and demonstration
 
 ## Tech Stack
 
 - **Backend**: Node.js, Express.js
 - **File Upload**: Multer
+- **HTTP Client**: Axios, form-data
 - **Security**: Helmet, CORS
 - **Logging**: Morgan
 - **Environment**: dotenv
@@ -25,35 +34,61 @@ A Node.js web server that allows users to upload food images and receive nutriti
 
 1. Clone the repository:
 
-   ```bash
-   git clone <repository-url>
-   cd food-analysis-server
-   ```
+    ```bash
+    git clone <repository-url>
+    cd food-analysis-server
+    ```
 
 2. Install dependencies:
 
-   ```bash
-   npm install
-   ```
+    ```bash
+    npm install
+    ```
 
 3. Create environment file:
 
-   ```bash
-   cp .env.example .env
-   ```
+    ```bash
+    cp .env.example .env
+    ```
 
 4. Start the development server:
 
-   ```bash
-   npm run dev
-   ```
+    ```bash
+    npm run dev
+    ```
 
 5. Open your browser and visit: `http://localhost:3000`
+
+## Equipment Simulation
+
+To test the system without physical equipment, use the included simulator:
+
+1. **Single test run:**
+
+    ```bash
+    npm run simulate-once
+    ```
+
+2. **Continuous simulation (every 10 seconds):**
+
+    ```bash
+    npm run simulate
+    ```
+
+3. **Add sample images for better simulation:**
+    ```bash
+    # Copy your food images to the sample-images folder
+    cp /path/to/food/images/* sample-images/
+    ```
+
+For detailed simulator documentation, see [EQUIPMENT-SIMULATOR.md](EQUIPMENT-SIMULATOR.md)
 
 ## Scripts
 
 - `npm start` - Start the production server
 - `npm run dev` - Start the development server with auto-restart
+- `npm run simulate` - Run equipment simulator continuously
+- `npm run simulate-once` - Run equipment simulator once
 - `npm run format` - Format code with Prettier
 - `npm run format:check` - Check code formatting
 
@@ -72,32 +107,32 @@ Upload a food image and get nutrition analysis.
 
 ```json
 {
-  "success": true,
-  "data": {
-    "image": {
-      "filename": "foodImage-1234567890.jpg",
-      "originalName": "apple.jpg",
-      "size": 524288,
-      "path": "/uploads/foodImage-1234567890.jpg"
-    },
-    "weight": 150,
-    "analysis": {
-      "foodType": "Apple",
-      "confidence": 0.85,
-      "nutrition": {
-        "calories": 78,
-        "protein": 0.45,
-        "carbs": 21,
-        "fat": 0.3,
-        "fiber": 3.6
-      },
-      "healthSuggestions": [
-        "Apples are rich in fiber and vitamin C",
-        "Great for maintaining healthy blood sugar levels"
-      ]
-    },
-    "timestamp": "2025-01-01T12:00:00.000Z"
-  }
+    "success": true,
+    "data": {
+        "image": {
+            "filename": "foodImage-1234567890.jpg",
+            "originalName": "apple.jpg",
+            "size": 524288,
+            "path": "/uploads/foodImage-1234567890.jpg"
+        },
+        "weight": 150,
+        "analysis": {
+            "foodType": "Apple",
+            "confidence": 0.85,
+            "nutrition": {
+                "calories": 78,
+                "protein": 0.45,
+                "carbs": 21,
+                "fat": 0.3,
+                "fiber": 3.6
+            },
+            "healthSuggestions": [
+                "Apples are rich in fiber and vitamin C",
+                "Great for maintaining healthy blood sugar levels"
+            ]
+        },
+        "timestamp": "2025-01-01T12:00:00.000Z"
+    }
 }
 ```
 
@@ -105,20 +140,42 @@ Upload a food image and get nutrition analysis.
 
 Health check endpoint.
 
+### GET /api/latest-analysis
+
+Get the most recent food analysis result. Used by the web interface to display real-time results.
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1640995200000,
+    "image": { "filename": "...", "path": "..." },
+    "weight": 150,
+    "analysis": { "foodType": "Apple", "confidence": 0.85, "nutrition": {...} },
+    "timestamp": "2025-01-01T12:00:00.000Z"
+  }
+}
+```
+
 ## Project Structure
 
 ```
 .
 ├── public/
-│   └── index.html          # Frontend interface
-├── uploads/                # Uploaded images storage
+│   └── index.html              # Simplified welcome interface
+├── uploads/                    # Uploaded images storage
+├── sample-images/              # Sample images for simulator
 ├── .github/
-│   └── copilot-instructions.md  # Copilot guidelines
-├── server.js               # Main server file
-├── package.json            # Dependencies and scripts
-├── .prettierrc             # Prettier configuration
-├── .env                    # Environment variables
-└── README.md               # This file
+│   └── copilot-instructions.md # Copilot guidelines
+├── server.js                   # Main server file
+├── equipment-simulator.js      # Equipment simulation program
+├── EQUIPMENT-SIMULATOR.md      # Simulator documentation
+├── package.json                # Dependencies and scripts
+├── .prettierrc                 # Prettier configuration
+├── .env                        # Environment variables
+└── README.md                   # This file
 ```
 
 ## Configuration
