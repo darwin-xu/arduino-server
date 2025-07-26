@@ -1,45 +1,252 @@
 <!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
 
-# Food Analysis Server - Copilot Instructions
+# Food Analysis Server - Coding Standards & Conventions
 
-This is a Node.js Express server for food image recognition and nutrition analysis. The project focuses on:
+## Code Style & Formatting
 
-## Project Overview
+Use **Prettier** for all formatting (configured in `.prettierrc`):
 
-- **Purpose**: Upload food images, analyze them for nutrition information, and provide health suggestions
-- **Tech Stack**: Node.js, Express.js, Multer (file uploads), CORS, Helmet, Morgan
-- **Frontend**: Vanilla HTML/CSS/JavaScript with modern styling
-- **File Handling**: Images stored in /uploads directory
+- **Semicolons**: Always use semicolons
+- **Quotes**: Single quotes for strings (`'hello'` not `"hello"`)
+- **Indentation**: 4 spaces, no tabs
+- **Line length**: 80 characters max
+- **Trailing commas**: ES5 style (`{ a: 1, b: 2, }`)
+- **Arrow functions**: Avoid parentheses for single parameters (`x => x.id`)
 
-## Key Features
+**Format before committing**: `npm run format`
 
-1. Image upload with drag-and-drop functionality
-2. Food weight input for accurate nutrition calculation
-3. Mock food recognition (ready for real AI integration)
-4. Nutrition analysis and health suggestions
-5. Responsive web interface
+## Variable & Function Naming
 
-## Code Patterns to Follow
+### Constants
 
-- Use async/await for asynchronous operations
-- Implement proper error handling with try-catch blocks
-- Follow REST API conventions for endpoints
-- Use middleware for security (helmet), logging (morgan), and CORS
-- Validate file types and sizes for uploads
-- Format code with Prettier (configured in .prettierrc)
+```javascript
+const SERVER_URL = 'http://localhost:3000'; // SCREAMING_SNAKE_CASE
+const SIMULATION_INTERVAL = 10000; // All caps with underscores
+```
 
-## Development Guidelines
+### Variables & Functions
 
-- Use `npm run dev` for development with auto-restart
-- Use `npm run format` to format code with Prettier
-- Keep environment variables in .env file
-- Implement proper error responses with appropriate HTTP status codes
-- Use descriptive variable names and add comments for complex logic
+```javascript
+const latestAnalysis = null; // camelCase
+const uploadsDir = path.join(__dirname, 'uploads'); // camelCase
+async function checkServerConnection() {} // camelCase functions
+```
 
-## Future Integration Points
+### Files & Directories
 
-- Replace mock food recognition with actual AI/ML service
-- Add database integration for storing analysis history
-- Implement user authentication and profiles
-- Add more detailed nutrition database
-- Consider adding barcode scanning functionality
+```javascript
+// kebab-case for files
+equipment-simulator.js
+simple-display.html
+
+// camelCase for directories
+sampleImages/
+uploadsDir/
+```
+
+## Logging Conventions
+
+### Use Emoji Prefixes for Clarity
+
+```javascript
+// Server startup
+console.log('🍎 Food Analysis Server running on http://localhost:3000');
+console.log('📁 Uploads directory: /path/to/uploads');
+
+// Equipment simulator
+console.log('🔧 Initializing Food Analysis Equipment Simulator...');
+console.log('⚖️  Weighing food...');
+console.log('📸 Capturing food image...');
+console.log('📡 Transmitting data to analysis server...');
+
+// Success/Error states
+console.log('✅ Equipment simulator initialized successfully');
+console.error('❌ Failed to connect to server:', error.message);
+
+// Frontend (browser console)
+console.log('🔍 Checking for new analysis data...');
+console.log('📡 API Response:', result);
+console.log('🖼️ Image path:', imagePath);
+```
+
+### Error Logging Pattern
+
+```javascript
+try {
+    // operation
+} catch (error) {
+    console.error('❌ Error during [operation]:', error.message);
+    // Handle gracefully, don't crash
+}
+```
+
+## API Response Standards
+
+### Success Response
+
+```javascript
+res.json({
+    success: true,
+    data: analysisResult,
+});
+```
+
+### Error Response
+
+```javascript
+res.status(400).json({
+    error: 'Descriptive error message',
+});
+```
+
+### Health Check
+
+```javascript
+res.json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+});
+```
+
+## File Upload Patterns
+
+### Filename Generation
+
+```javascript
+const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+const filename =
+    file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname);
+// Result: foodImage-1753509174625-123456789.jpg
+```
+
+### File Validation
+
+```javascript
+// Accept only images
+if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+} else {
+    cb(new Error('Only image files are allowed!'), false);
+}
+```
+
+## Error Handling Conventions
+
+### Multer Error Middleware
+
+```javascript
+app.use((error, req, res, next) => {
+    if (error instanceof multer.MulterError) {
+        if (error.code === 'LIMIT_FILE_SIZE') {
+            return res
+                .status(400)
+                .json({ error: 'File too large. Maximum size is 5MB.' });
+        }
+    }
+    // Handle other errors...
+});
+```
+
+### Async Route Handlers
+
+```javascript
+app.post('/api/analyze-food', upload.single('foodImage'), async (req, res) => {
+    try {
+        // Validate inputs first
+        if (!req.file) {
+            return res.status(400).json({ error: 'No image file uploaded' });
+        }
+
+        const { weight } = req.body;
+        if (!weight || isNaN(weight) || weight <= 0) {
+            return res.status(400).json({ error: 'Valid weight is required' });
+        }
+
+        // Process...
+    } catch (error) {
+        console.error('Error analyzing food:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+```
+
+## Frontend JavaScript Patterns
+
+### Polling with Cache Busting
+
+```javascript
+const response = await fetch('/api/latest-analysis?t=' + Date.now());
+```
+
+### ID-based Change Detection
+
+```javascript
+if (result.data.id !== lastAnalysisId) {
+    lastAnalysisId = result.data.id;
+    displayResults(result.data);
+}
+```
+
+### Graceful Error Handling
+
+```javascript
+try {
+    const response = await fetch('/api/endpoint');
+    if (response.ok) {
+        // Handle success
+    } else {
+        console.error('❌ API request failed:', response.status);
+    }
+} catch (error) {
+    console.error('❌ Network error:', error);
+    // Continue operation, don't break UI
+}
+```
+
+## Development Environment
+
+### Essential Commands
+
+```bash
+npm run dev          # Development with auto-restart
+npm run format       # Format all code with Prettier
+npm run simulate     # Continuous equipment simulation
+npm run simulate-once # Single test simulation
+```
+
+### VS Code Simple Browser Compatibility
+
+```javascript
+// Required helmet config - DO NOT change
+app.use(
+    helmet({
+        contentSecurityPolicy: false, // Allows iframe embedding
+        frameguard: false, // Removes X-Frame-Options blocking
+    })
+);
+```
+
+## Testing Approach
+
+**No formal test framework** - Use manual testing:
+
+- `http://localhost:3000/test.html` - API response testing
+- `http://localhost:3000/simple-display.html` - Debug console with logs
+- Equipment simulator for end-to-end testing
+
+## Configuration Management
+
+### Environment Variables (.env)
+
+```properties
+PORT=3000
+```
+
+### Constants at Top of Files
+
+```javascript
+const SERVER_URL = 'http://localhost:3000';
+const SIMULATION_INTERVAL = 10000; // 10 seconds
+```
+
+**Always use `const` for configuration values that don't change during runtime.**
