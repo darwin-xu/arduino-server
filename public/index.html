@@ -218,7 +218,7 @@
         <div class="container">
             <div class="welcome-card">
                 <div class="header">
-                    <h1>🍎 Food Analysis System</h1>
+                    <h1>🍎 Food Analysis System v2</h1>
                     <p>
                         Welcome to the automated food analysis and nutrition
                         tracking system. Our equipment will automatically
@@ -270,6 +270,7 @@
                     const response = await fetch(
                         '/api/latest-analysis?t=' + Date.now()
                     );
+                    console.log('📡 Response status:', response.status);
                     if (response.ok) {
                         const result = await response.json();
                         console.log('📡 API Response:', result);
@@ -293,7 +294,7 @@
                                 showLoading();
 
                                 // Show loading for 2 seconds, then display results
-                                setTimeout(() => {
+                                setTimeout(function() {
                                     displayResults(result.data);
                                 }, 2000);
                             } else {
@@ -439,11 +440,14 @@
             // Initialize the system
             document.addEventListener('DOMContentLoaded', function () {
                 console.log('🍎 Food Analysis System ready!');
+                console.log('🔧 Setting up initial status...');
                 updateStatus(
                     'System Ready - Waiting for Equipment',
                     'Page loaded at ' + new Date().toLocaleTimeString()
                 );
+                console.log('🔄 Starting polling system...');
                 startPolling();
+                console.log('✅ System initialization complete!');
             });
 
             // Cleanup on page unload

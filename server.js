@@ -20,7 +20,10 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: false, // Disable CSP entirely for VS Code compatibility
+    frameguard: false, // Disable X-Frame-Options to allow VS Code Simple Browser
+}));
 app.use(cors());
 app.use(morgan('combined'));
 app.use(express.json());
