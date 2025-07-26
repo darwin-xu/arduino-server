@@ -128,7 +128,7 @@ app.post('/api/analyze-food', upload.single('foodImage'), async (req, res) => {
             data: analysisResult,
         });
     } catch (error) {
-        console.error('Error analyzing food:', error);
+        console.error('❌ Error during food analysis:', error.message);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -148,7 +148,7 @@ app.get('/api/latest-analysis', (req, res) => {
     } else {
         res.json({
             success: false,
-            message: 'No analysis data available',
+            error: 'No analysis data available',
         });
     }
 });
@@ -167,7 +167,7 @@ app.use((error, req, res, next) => {
         return res.status(400).json({ error: 'Only image files are allowed.' });
     }
 
-    console.error(error);
+    console.error('❌ Internal server error:', error.message);
     res.status(500).json({ error: 'Something went wrong!' });
 });
 
