@@ -2,6 +2,58 @@
 
 # Food Analysis Server - Coding Standards & Conventions
 
+## File Organization Standards
+
+### Separation of Concerns
+
+**Always split HTML files into separate files for better organization:**
+
+```
+public/
+├── index.html              # HTML structure only
+├── css/
+│   └── index.css          # All CSS styles
+└── js/
+    └── index.js           # All JavaScript logic
+```
+
+**Example refactored structure:**
+
+- `simple-display.html` → `simple-display.html` + `css/simple-display.css` + `js/simple-display.js`
+- `test.html` → `test.html` + `js/test.js`
+- `index.html` → `index.html` + `css/index.css` + `js/index.js`
+
+**HTML files should only contain:**
+
+- Document structure (`<!doctype html>`, `<head>`, `<body>`)
+- Semantic markup and content
+- Links to external CSS and JS files
+
+```html
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Page Title</title>
+        <link rel="stylesheet" href="css/page-name.css" />
+    </head>
+    <body>
+        <!-- HTML content only -->
+        <script src="js/page-name.js"></script>
+    </body>
+</html>
+```
+
+**CSS files (`css/`) should contain:**
+
+- All styling rules and media queries
+- No inline styles in HTML
+
+**JavaScript files (`js/`) should contain:**
+
+- All interactive logic and API calls
+- No inline `<script>` tags in HTML (except for external CDN links)
+
 ## Code Style & Formatting
 
 Use **Prettier** for all formatting (configured in `.prettierrc`):
